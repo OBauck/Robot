@@ -12,18 +12,26 @@ using namespace std;
 #define MAX_VELOCITY_RAD		2.0944f	//MAX_VELOCITY_DEGREE*M_PI/180.0f	//rad pr sec
 #define STEP_SIZE	0.02	//20ms
 
+template <typename T> int sgn(T val) {
+	return (T(0) < val) - (val < T(0));
+}
+
+/*
 void trajectoryPlanningDegrees(Servo*, float, float);
-vector<float> trajectoryPlanningDegrees(float, float);
-vector<float> trajectoryPlanning(float, float, float);
+vector<float> trajectoryPlanningDegrees(float, float);*/
+vector<float> trajectoryPlanningQuintic(float, float, float);
+vector<float> trajectoryPlanningLSPD(float, float, float);
 
 class Manipulator
 {
 public:
 Manipulator(PCA9685*, int, int, int);
 void goToPosition(Point3D);
-void goToPositionSmooth(Point3D);
+void goToPositionSmoothQuintic(Point3D);
+void goToPositionSmoothLSPD(Point3D);
 void updatePosition(float, float, float);
-void updatePositionSmooth(float, float, float);
+void updatePositionSmoothQuintic(float, float, float);
+void updatePositionSmoothLSPD(float, float, float);
 
 private:
 Servo servo1;
