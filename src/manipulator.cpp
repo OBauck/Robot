@@ -93,10 +93,10 @@ Manipulator::Manipulator(PCA9685* pca, int this_A1, int this_A2, int this_D6) :
 	D6 = this_D6;
 }
 
-void Manipulator::goToPosition(int x, int y, int z)
+void Manipulator::goToPosition(Point3D p)
 {
 	float c3, s3, t1, t2, t3;
-	c3 = (z*z+x*x+y*y-A1*A1-A2*A2)/(2.0*A1*A2);
+	c3 = (p.z*p.z+p.x*p.x+p.y*p.y-A1*A1-A2*A2)/(2.0*A1*A2);
 	s3 = sqrt(1-c3*c3);
 	if(s3 != s3)
 	{
@@ -104,8 +104,8 @@ void Manipulator::goToPosition(int x, int y, int z)
 		s3 = 0;
 	}
 	t3 = atan2(s3, c3);
-	t2 = M_PI/2.0 - atan2(z, sqrt(x*x + y*y)) - atan2(A2*s3, A1 + A2*c3);
-	t1 = atan2(-x, y);
+	t2 = M_PI/2.0 - atan2(p.z, sqrt(p.x*p.x + p.y*p.y)) - atan2(A2*s3, A1 + A2*c3);
+	t1 = atan2(-p.x, p.y);
 	
 	updatePosition(t1, t2, t3);
 }
@@ -113,7 +113,7 @@ void Manipulator::goToPosition(int x, int y, int z)
 void Manipulator::goToPositionSmooth(int x, int y, int z)
 {
 	float c3, s3, t1, t2, t3;
-	c3 = (z*z+x*x+y*y-A1*A1-A2*A2)/(2.0*A1*A2);
+	c3 = (p.z*p.z+p.x*p.x+p.y*p.y-A1*A1-A2*A2)/(2.0*A1*A2);
 	s3 = sqrt(1-c3*c3);
 	if(s3 != s3)
 	{
@@ -121,8 +121,8 @@ void Manipulator::goToPositionSmooth(int x, int y, int z)
 		s3 = 0;
 	}
 	t3 = atan2(s3, c3);
-	t2 = M_PI/2.0 - atan2(z, sqrt(x*x + y*y)) - atan2(A2*s3, A1 + A2*c3);
-	t1 = atan2(-x, y);
+	t2 = M_PI/2.0 - atan2(p.z, sqrt(p.x*p.x + p.y*p.y)) - atan2(A2*s3, A1 + A2*c3);
+	t1 = atan2(-p.x, p.y);
 	
 	updatePositionSmooth(t1, t2, t3);
 }

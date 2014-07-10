@@ -4,6 +4,7 @@
 
 #include <vector>
 #include "servo.h"
+#include "geometry.h"
 
 using namespace std;
 
@@ -19,8 +20,8 @@ class Manipulator
 {
 public:
 Manipulator(PCA9685*, int, int, int);
-void goToPosition(int, int, int);
-void goToPositionSmooth(int, int, int);
+void goToPosition(Point3D);
+void goToPositionSmooth(Point3D);
 void updatePosition(float, float, float);
 void updatePositionSmooth(float, float, float);
 
