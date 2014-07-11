@@ -12,6 +12,10 @@ using namespace std;
 #define MAX_VELOCITY_RAD		2.0944f	//MAX_VELOCITY_DEGREE*M_PI/180.0f	//rad pr sec
 #define STEP_SIZE	0.02	//20ms
 
+#define XSTART 0
+#define YSTART 0
+#define ZSTART 203
+
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }

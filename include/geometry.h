@@ -2,10 +2,13 @@
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_
 
+using namespace std;
+
 class Point3D
 {
 public:
 	Point3D(float thisx, float thisy, float thisz) : x(thisx), y(thisy), z(thisz);
+	string ToString();
 private:
 	float x;
 	float y;

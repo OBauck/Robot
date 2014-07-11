@@ -21,7 +21,7 @@ Vector3D::Vector3D(float thisx, float thisy, float thisz)
 	length = sqrt(x*x+y*y+z*z);
 }
 
-Vector3D::normalize()
+void Vector3D::normalize()
 {
 	x /= length;
 	y /= length;
