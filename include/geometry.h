@@ -7,9 +7,8 @@ using namespace std;
 class Point3D
 {
 public:
-	Point3D(float thisx, float thisy, float thisz) : x(thisx), y(thisy), z(thisz);
-	string ToString();
-private:
+	Point3D(float thisx, float thisy, float thisz) : x(thisx), y(thisy), z(thisz) {};
+	Point3D() {x = 0; y = 0; z = 0;};
 	float x;
 	float y;
 	float z;
@@ -21,11 +20,14 @@ public:
 	Vector3D(float, float, float);
 	Vector3D(Point3D,Point3D);
 	void normalize();
+	float length;
+	float getX();
+	float getY();
+	float getZ();
 private:
 	float x;
 	float y;
 	float z;
-	float length;
 };
 
 class Circle3D

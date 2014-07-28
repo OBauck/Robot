@@ -1,7 +1,8 @@
-﻿#include <inttypes.h>
+#include <inttypes.h>
 #include <iostream>
 #include <unistd.h>
 #include <math.h>
+#include "geometry.h"
 
 using namespace std;
 
@@ -21,6 +22,21 @@ Vector3D::Vector3D(float thisx, float thisy, float thisz)
 	length = sqrt(x*x+y*y+z*z);
 }
 
+float Vector3D::getX()
+{
+	return x;
+}
+
+float Vector3D::getY()
+{
+	return y;
+}
+
+float Vector3D::getZ()
+{
+	return z;
+}
+
 void Vector3D::normalize()
 {
 	x /= length;
@@ -37,10 +53,10 @@ line3D::line3D(Point3D _startPoint, Point3D _endPoint) :
 }
 
 line3D::line3D(Point3D _startPoint, Vector3D _direction) : 
-	startPoint(_startPoint), Vector3D(direction), endPoint()
+	startPoint(_startPoint), direction(_direction), endPoint()
 {
-	endPoint.x = startPoint.x + direction.x;
-	endPoint.y = startPoint.y + direction.y;
-	endPoint.z = startPoint.z + direction.z;
+	endPoint.x = startPoint.x + direction.getX();
+	endPoint.y = startPoint.y + direction.getY();
+	endPoint.z = startPoint.z + direction.getZ();
 	length = direction.length;
 }

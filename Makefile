@@ -6,7 +6,7 @@ BUILDDIR := build
 TARGET := main
 
 INCLUDEDIRS	= -I include
-LDFLAGS		= -lwiringPi
+LDFLAGS	= -lwiringPi -lX11
 
 VPATH := SRCDIR
 SRCEXT := cpp

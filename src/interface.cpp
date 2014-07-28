@@ -51,7 +51,7 @@ void windowInit()
     printf("Display open\n");
 }
 
-void checkEvent(Manipulator *man, Car *car){
+void checkEvent(Manipulator *man){
         XNextEvent (display, & event);
         switch(event.type)
 		{
@@ -79,7 +79,7 @@ void checkEvent(Manipulator *man, Car *car){
 				}
 				if(event.xkey.keycode == MOUSE_WHEEL_BACKWARD)
 				{
-					zpos+=10;
+					position.z += 10;
 					man->goToPosition(position);
 				}
 			
