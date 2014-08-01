@@ -151,6 +151,26 @@ void Manipulator::goToPosition(Point3D p)
 	updatePosition(t1, t2, t3);
 }
 
+void Manipulator::goToPositionPencil(Point3D p)
+{
+	float c3, s3, t1, t2, t3;
+	c3 = (p.z*p.z+p.x*p.x+p.y*p.y-A1*A1-A2*A2)/(2.0*A1*A2);
+	s3 = sqrt(1-c3*c3);
+	if(s3 != s3)
+	{
+		cout<<"Position out of reach, setting sin(theta3) to zero"<<endl;
+		s3 = 0;
+	}
+	t3 = atan2(s3, c3);
+	t2 = M_PI/2.0 - atan2(p.z, sqrt(p.x*p.x + p.y*p.y)) - atan2(A2*s3, A1 + A2*c3);
+	t1 = atan2(-p.x, p.y);
+	
+	t5 = M_PI - t2 - t3;
+	
+	updatePosition(t1, t2, t3);
+	updateOrientation(t5);
+}
+
 void Manipulator::goToPositionSmoothQuintic(Point3D p)
 {
 	float c3, s3, t1, t2, t3;
@@ -183,6 +203,21 @@ void Manipulator::goToPositionSmoothLSPD(Point3D p)
 	t1 = atan2(-p.x, p.y);
 	
 	updatePositionSmoothLSPD(t1, t2, t3);
+}
+
+void Manipulator::updateOrientation(float t5, float t6)
+{
+	theta5 = t5;
+	theta6 = t6;
+	
+	servo5.setAngleRad(theta5);
+	servo6.setAngleRad(theta6);
+}
+
+void Manipulator::updateOrientation(float t5)
+{
+	theta5 = t5;
+	servo5.setAngleRad(theta5);
 }
 
 void Manipulator::updatePosition(float t1, float t2, float t3)
@@ -266,4 +301,15 @@ void Manipulator::updatePositionSmoothLSPD(float t1, float t2, float t3)
 	theta2 = t2;
 	theta3 = t3;
 	
+}
+
+void Manipulator::followLine(line3D line)
+{
+	float steps = line.length/STEP_SIZE_CURVE;
+	
+	for (int i = 0; i < steps; i++)
+	{
+		goToPositionPencil(Point3D(line.startPoint.x + i*line.direction.x, line.startPoint.y + i*line.direction.y,
+		line.startPoint.z + i*line.direction.z));
+	}
 }

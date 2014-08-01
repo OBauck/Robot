@@ -10,7 +10,8 @@ using namespace std;
 
 #define MAX_VELOCITY_DEGREE		120.0f		//degrees pr sec
 #define MAX_VELOCITY_RAD		2.0944f	//MAX_VELOCITY_DEGREE*M_PI/180.0f	//rad pr sec
-#define STEP_SIZE	0.02	//20ms
+#define STEP_SIZE	0.02f	//20ms
+#define STEP_SIZE_CURVE		1.0f	//1mm
 
 #define XSTART 0
 #define YSTART 0
@@ -31,11 +32,18 @@ class Manipulator
 public:
 Manipulator(PCA9685*, int, int, int);
 void goToPosition(Point3D);
+void goToPositionPencil(Point3D);
 void goToPositionSmoothQuintic(Point3D);
 void goToPositionSmoothLSPD(Point3D);
+
+void updateOrientation(float);
+void updateOrientation(float, float);
+
 void updatePosition(float, float, float);
 void updatePositionSmoothQuintic(float, float, float);
 void updatePositionSmoothLSPD(float, float, float);
+
+void followLine(line3D);
 
 private:
 Servo servo1;

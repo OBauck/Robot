@@ -50,6 +50,7 @@ line3D::line3D(Point3D _startPoint, Point3D _endPoint) :
 	startPoint(_startPoint), endPoint(_endPoint), direction(startPoint, endPoint)
 {
 	length = direction.length;
+	direction.normalize();
 }
 
 line3D::line3D(Point3D _startPoint, Vector3D _direction) : 
