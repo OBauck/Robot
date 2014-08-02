@@ -20,7 +20,7 @@ public:
 	Vector3D(float, float, float);
 	Vector3D(Point3D,Point3D);
 	void normalize();
-	float length;
+	float getLength();
 	float getX();
 	float getY();
 	float getZ();
@@ -28,6 +28,7 @@ private:
 	float x;
 	float y;
 	float z;
+	float length;
 };
 
 class Circle3D
@@ -44,11 +45,15 @@ private:
 	float length;
 };
 
-class line3D
+class Line3D
 {
 public:
-	line3D(Point3D, Point3D);
-	line3D(Point3D, Vector3D);
+	Line3D(Point3D, Point3D);
+	Line3D(Point3D, Vector3D);
+	float getLength();
+	Point3D getStartPoint();
+	Point3D getEndPoint();
+	Vector3D getDirection();
 private:
 	Point3D startPoint;
 	Point3D endPoint;

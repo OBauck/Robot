@@ -153,7 +153,7 @@ void Manipulator::goToPosition(Point3D p)
 
 void Manipulator::goToPositionPencil(Point3D p)
 {
-	float c3, s3, t1, t2, t3;
+	float c3, s3, t1, t2, t3, t5;
 	c3 = (p.z*p.z+p.x*p.x+p.y*p.y-A1*A1-A2*A2)/(2.0*A1*A2);
 	s3 = sqrt(1-c3*c3);
 	if(s3 != s3)
@@ -303,13 +303,13 @@ void Manipulator::updatePositionSmoothLSPD(float t1, float t2, float t3)
 	
 }
 
-void Manipulator::followLine(line3D line)
+void Manipulator::followLine(Line3D line)
 {
-	float steps = line.length/STEP_SIZE_CURVE;
+	float steps = line.getLength()/STEP_SIZE_CURVE;
 	
 	for (int i = 0; i < steps; i++)
 	{
-		goToPositionPencil(Point3D(line.startPoint.x + i*line.direction.x, line.startPoint.y + i*line.direction.y,
-		line.startPoint.z + i*line.direction.z));
+		goToPositionPencil(Point3D((line.getStartPoint()).x + i*(line.getDirection()).getX(), (line.getStartPoint()).y + i*(line.getDirection()).getY(),
+		(line.getStartPoint()).z + i*(line.getDirection()).getZ()));
 	}
 }

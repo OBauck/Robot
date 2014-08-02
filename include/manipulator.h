@@ -43,7 +43,7 @@ void updatePosition(float, float, float);
 void updatePositionSmoothQuintic(float, float, float);
 void updatePositionSmoothLSPD(float, float, float);
 
-void followLine(line3D);
+void followLine(Line3D);
 
 private:
 Servo servo1;

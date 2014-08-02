@@ -37,6 +37,11 @@ float Vector3D::getZ()
 	return z;
 }
 
+float Vector3D::getLength()
+{
+	return length;
+}
+
 void Vector3D::normalize()
 {
 	x /= length;
@@ -46,18 +51,38 @@ void Vector3D::normalize()
 	length = sqrt(x*x+y*y+z*z); 
 } 
 
-line3D::line3D(Point3D _startPoint, Point3D _endPoint) : 
+Line3D::Line3D(Point3D _startPoint, Point3D _endPoint) : 
 	startPoint(_startPoint), endPoint(_endPoint), direction(startPoint, endPoint)
 {
-	length = direction.length;
+	length = direction.getLength();
 	direction.normalize();
 }
 
-line3D::line3D(Point3D _startPoint, Vector3D _direction) : 
+Line3D::Line3D(Point3D _startPoint, Vector3D _direction) : 
 	startPoint(_startPoint), direction(_direction), endPoint()
 {
 	endPoint.x = startPoint.x + direction.getX();
 	endPoint.y = startPoint.y + direction.getY();
 	endPoint.z = startPoint.z + direction.getZ();
-	length = direction.length;
+	length = direction.getLength();
+}
+
+Point3D Line3D::getStartPoint()
+{
+	return startPoint;
+}
+
+Point3D Line3D::getEndPoint()
+{
+	return endPoint;
+}
+
+float Line3D::getLength()
+{
+	return length;
+}
+
+Vector3D Line3D::getDirection()
+{
+	return direction;
 }
