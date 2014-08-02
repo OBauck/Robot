@@ -29,12 +29,14 @@ void Servo::setAngleRad(float rad)
 {
 	if (rad < rad_low)
 	{
+		cout<<"Servo at output nr: "<<out_nr<<endl;
 		cout<<"angle too low, setting angle to minimum: "<<degree_low<<" degrees"<<endl;
 		setAngleRad(rad_low);
 		return;
 	}
 	if (rad > rad_high)
 	{
+		cout<<"Servo at output nr: "<<out_nr<<endl;
 		cout<<"angle too high, setting angle to maximum: "<<degree_high<<" degrees"<<endl;
 		setAngleRad(rad_high);
 		return;

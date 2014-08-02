@@ -15,17 +15,25 @@ using namespace std;
 int main()
 {
 	PCA9685 p(0x40, 50);
-
-//	int x, y, z;
-//	Point3D position;
-	Manipulator man(&p, 99, 104, 0);
 	
-	windowInit();
+	int x, y, z;
+	Point3D position;
+	Manipulator man(&p, 99, 104, 0);
+
+	Point3D startPoint(-50,150,0);
+	Point3D endPoint(50, 150, 0);
+	
+	Line3D line(startPoint, endPoint);
+
+	cin>>x;
+
+	man.followLine(line);
+	
+//	windowInit();
 	
 	while(1)
 	{
-
-		checkEvent(&man);
+//		checkEvent(&man);
 //		cout<<"x: ";
 //		cin>>x;
 //		cout<<"y: ";

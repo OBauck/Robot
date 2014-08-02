@@ -9,58 +9,6 @@
 
 using namespace std;
 
-struct posAngles 
-{
-	float theta1;
-	float theta2;
-	float theta3;
-};
-
-/*
-void trajectoryPlanningDegrees(Servo *servo, float startAngle, float endAngle)
-{
-	float tf, a0, a3, a4, a5, angle;
-	tf = 30.0/16.0*(endAngle-startAngle)/MAX_VELOCITY_DEGREE;
-	a0 = startAngle;
-	a3 = 10*(endAngle-startAngle)/pow(tf,3);
-	a4 = -15*(endAngle-startAngle)/pow(tf,4);
-	a5 = 6*(endAngle-startAngle)/pow(tf,5);
-	
-	int n = tf/STEP_SIZE;
-	float t = 0;
-	for (int i=0; i<n; i++)
-	{
-		angle = a0 + a3*pow(t,3) + a4*pow(t,4) + a5*pow(t,5);
-		servo->setAngleDegree(angle);
-		t += STEP_SIZE;
-		usleep(20000);
-	}
-	
-}
-
-vector<float> trajectoryPlanningDegrees(float startAngle, float endAngle)
-{
-	float tf, a0, a3, a4, a5, angle;
-	tf = 30.0/16.0*fabs(endAngle-startAngle)/MAX_VELOCITY_DEGREE;
-	a0 = startAngle;
-	a3 = 10*(endAngle-startAngle)/pow(tf,3);
-	a4 = -15*(endAngle-startAngle)/pow(tf,4);
-	a5 = 6*(endAngle-startAngle)/pow(tf,5);
-
-	int n;
-	n = tf/STEP_SIZE;
-	float t = 0;
-	vector<float> output;
-	for (int i=0; i<n; i++)
-	{
-		angle = a0 + a3*pow(t,3) + a4*pow(t,4) + a5*pow(t,5);
-		output.push_back(angle);
-		t += STEP_SIZE;
-	}
-
-	return output;
-}*/
-
 vector<float> trajectoryPlanningQuintic(float startAngle, float endAngle, float tf)
 {
 	float a0, a3, a4, a5, angle;
@@ -116,16 +64,36 @@ vector<float> trajectoryPlanningLSPD(float startAngle, float endAngle, float tf)
 	return output;
 }
 
+posAngles calculateAngles(Point3D p, int A1, int A2)
+{
+	float c3, s3;
+	posAngles angles;
+	
+	c3 = (p.z*p.z+p.x*p.x+p.y*p.y-A1*A1-A2*A2)/(2.0*A1*A2);
+	s3 = sqrt(1-c3*c3);
+	if(s3 != s3)
+	{
+		cout<<"Position out of reach, setting sin(theta3) to zero"<<endl;
+		s3 = 0;
+	}
+	angles.theta3 = atan2(s3, c3);
+	angles.theta2 = M_PI/2.0 - atan2(p.z, sqrt(p.x*p.x + p.y*p.y)) - atan2(A2*s3, A1 + A2*c3);
+	angles.theta1 = atan2(-p.x, p.y);
+
+	return angles;
+}
+
 Manipulator::Manipulator(PCA9685* pca, int this_A1, int this_A2, int this_D6) : 
 	servo1(pca, 720, 2340, -80, 80, 0),
 	servo2(pca, 720, 2340, -80, 90, 1),
 	servo3(pca, 720, 2340, -60, 90, 2),
-	servo5(pca, 720, 2340, -60, 90, 3),
+	servo5(pca, 720, 2340, 0, 150, 3),
 	servo6(pca, 720, 2340, -60, 90, 4),
 	gripper(pca, 720, 2340, -60, 90, 5)
 {
-	
-	updatePosition(0,0,0);
+
+	posAngles angles = {0, 0, 0};
+	updatePosition(angles);
 	theta5 = 0;
 	theta6 = 0;
 	
@@ -136,73 +104,32 @@ Manipulator::Manipulator(PCA9685* pca, int this_A1, int this_A2, int this_D6) :
 
 void Manipulator::goToPosition(Point3D p)
 {
-	float c3, s3, t1, t2, t3;
-	c3 = (p.z*p.z+p.x*p.x+p.y*p.y-A1*A1-A2*A2)/(2.0*A1*A2);
-	s3 = sqrt(1-c3*c3);
-	if(s3 != s3)
-	{
-		cout<<"Position out of reach, setting sin(theta3) to zero"<<endl;
-		s3 = 0;
-	}
-	t3 = atan2(s3, c3);
-	t2 = M_PI/2.0 - atan2(p.z, sqrt(p.x*p.x + p.y*p.y)) - atan2(A2*s3, A1 + A2*c3);
-	t1 = atan2(-p.x, p.y);
+	posAngles angles = calculateAngles(p, A1, A2);
 	
-	updatePosition(t1, t2, t3);
+	updatePosition(angles);
 }
 
 void Manipulator::goToPositionPencil(Point3D p)
 {
-	float c3, s3, t1, t2, t3, t5;
-	c3 = (p.z*p.z+p.x*p.x+p.y*p.y-A1*A1-A2*A2)/(2.0*A1*A2);
-	s3 = sqrt(1-c3*c3);
-	if(s3 != s3)
-	{
-		cout<<"Position out of reach, setting sin(theta3) to zero"<<endl;
-		s3 = 0;
-	}
-	t3 = atan2(s3, c3);
-	t2 = M_PI/2.0 - atan2(p.z, sqrt(p.x*p.x + p.y*p.y)) - atan2(A2*s3, A1 + A2*c3);
-	t1 = atan2(-p.x, p.y);
+	posAngles angles = calculateAngles(p, A1, A2);
+	updatePosition(angles);
 	
-	t5 = M_PI - t2 - t3;
-	
-	updatePosition(t1, t2, t3);
+	float t5 = M_PI - angles.theta2 - angles.theta3;
 	updateOrientation(t5);
 }
 
 void Manipulator::goToPositionSmoothQuintic(Point3D p)
 {
-	float c3, s3, t1, t2, t3;
-	c3 = (p.z*p.z+p.x*p.x+p.y*p.y-A1*A1-A2*A2)/(2.0*A1*A2);
-	s3 = sqrt(1-c3*c3);
-	if(s3 != s3)
-	{
-		cout<<"Position out of reach, setting sin(theta3) to zero"<<endl;
-		s3 = 0;
-	}
-	t3 = atan2(s3, c3);
-	t2 = M_PI/2.0 - atan2(p.z, sqrt(p.x*p.x + p.y*p.y)) - atan2(A2*s3, A1 + A2*c3);
-	t1 = atan2(-p.x, p.y);
+	posAngles angles = calculateAngles(p, A1, A2);
 	
-	updatePositionSmoothQuintic(t1, t2, t3);
+	updatePositionSmoothQuintic(angles);
 }
 
 void Manipulator::goToPositionSmoothLSPD(Point3D p)
 {
-	float c3, s3, t1, t2, t3;
-	c3 = (p.z*p.z+p.x*p.x+p.y*p.y-A1*A1-A2*A2)/(2.0*A1*A2);
-	s3 = sqrt(1-c3*c3);
-	if(s3 != s3)
-	{
-		cout<<"Position out of reach, setting sin(theta3) to zero"<<endl;
-		s3 = 0;
-	}
-	t3 = atan2(s3, c3);
-	t2 = M_PI/2.0 - atan2(p.z, sqrt(p.x*p.x + p.y*p.y)) - atan2(A2*s3, A1 + A2*c3);
-	t1 = atan2(-p.x, p.y);
+	posAngles angles = calculateAngles(p, A1, A2);
 	
-	updatePositionSmoothLSPD(t1, t2, t3);
+	updatePositionSmoothLSPD(angles);
 }
 
 void Manipulator::updateOrientation(float t5, float t6)
@@ -220,32 +147,31 @@ void Manipulator::updateOrientation(float t5)
 	servo5.setAngleRad(theta5);
 }
 
-void Manipulator::updatePosition(float t1, float t2, float t3)
+void Manipulator::updatePosition(posAngles angles)
 {
-	theta1 = t1;
-	theta2 = t2;
-	theta3 = t3;
+	theta1 = angles.theta1;
+	theta2 = angles.theta2;
+	theta3 = angles.theta3;
 	
 	servo1.setAngleRad(theta1);
 	servo2.setAngleRad(theta2);
 	servo3.setAngleRad(theta3);
 }
 
-void Manipulator::updatePositionSmoothQuintic(float t1, float t2, float t3)
+void Manipulator::updatePositionSmoothQuintic(posAngles angles)
 {
 	vector<float> q1, q2, q3;
 	float tf1, tf2, tf3, tf;
-	tf1 = 30.0/16.0*fabs(t1 - theta1)/MAX_VELOCITY_RAD;
-	tf2 = 30.0/16.0*fabs(t2 - theta2)/MAX_VELOCITY_RAD;
-	tf3 = 30.0/16.0*fabs(t3 - theta3)/MAX_VELOCITY_RAD;
+	tf1 = 30.0/16.0*fabs(angles.theta1 - theta1)/MAX_VELOCITY_RAD;
+	tf2 = 30.0/16.0*fabs(angles.theta2 - theta2)/MAX_VELOCITY_RAD;
+	tf3 = 30.0/16.0*fabs(angles.theta3 - theta3)/MAX_VELOCITY_RAD;
 
 	tf = fmax(tf1, tf2);
 	tf = fmax(tf3, tf);
 
-	cout<<"tf: "<<tf<<endl;
-	q1 = trajectoryPlanningQuintic(theta1, t1, tf);
-	q2 = trajectoryPlanningQuintic(theta2, t2, tf);
-	q3 = trajectoryPlanningQuintic(theta3, t3, tf);
+	q1 = trajectoryPlanningQuintic(theta1, angles.theta1, tf);
+	q2 = trajectoryPlanningQuintic(theta2, angles.theta2, tf);
+	q3 = trajectoryPlanningQuintic(theta3, angles.theta3, tf);
 	if ( q1.size() != q2.size() || q1.size() != q2.size() )
 	{
 		cout<<"vectors not the same length!"<<endl;
@@ -261,27 +187,26 @@ void Manipulator::updatePositionSmoothQuintic(float t1, float t2, float t3)
 		usleep(20000);
 	}
 
-	theta1 = t1;
-	theta2 = t2;
-	theta3 = t3;
+	theta1 = angles.theta1;
+	theta2 = angles.theta2;
+	theta3 = angles.theta3;
 	
 }
 
-void Manipulator::updatePositionSmoothLSPD(float t1, float t2, float t3)
+void Manipulator::updatePositionSmoothLSPD(posAngles angles)
 {
 	vector<float> q1, q2, q3;
 	float tf1, tf2, tf3, tf;
-	tf1 = 4.0/3.0*fabs(t1 - theta1)/MAX_VELOCITY_RAD;
-	tf2 = 4.0/3.0*fabs(t2 - theta2)/MAX_VELOCITY_RAD;
-	tf3 = 4.0/3.0*fabs(t3 - theta3)/MAX_VELOCITY_RAD;
+	tf1 = 4.0/3.0*fabs(angles.theta1 - theta1)/MAX_VELOCITY_RAD;
+	tf2 = 4.0/3.0*fabs(angles.theta2 - theta2)/MAX_VELOCITY_RAD;
+	tf3 = 4.0/3.0*fabs(angles.theta3 - theta3)/MAX_VELOCITY_RAD;
 
 	tf = fmax(tf1, tf2);
 	tf = fmax(tf3, tf);
 
-	cout<<"tf: "<<tf<<endl;
-	q1 = trajectoryPlanningLSPD(theta1, t1, tf);
-	q2 = trajectoryPlanningLSPD(theta2, t2, tf);
-	q3 = trajectoryPlanningLSPD(theta3, t3, tf);
+	q1 = trajectoryPlanningLSPD(theta1, angles.theta1, tf);
+	q2 = trajectoryPlanningLSPD(theta2, angles.theta2, tf);
+	q3 = trajectoryPlanningLSPD(theta3, angles.theta3, tf);
 	if ( q1.size() != q2.size() || q1.size() != q2.size() )
 	{
 		cout<<"vectors not the same length!"<<endl;
@@ -297,19 +222,29 @@ void Manipulator::updatePositionSmoothLSPD(float t1, float t2, float t3)
 		usleep(20000);
 	}
 
-	theta1 = t1;
-	theta2 = t2;
-	theta3 = t3;
+	theta1 = angles.theta1;
+	theta2 = angles.theta2;
+	theta3 = angles.theta3;
 	
 }
 
 void Manipulator::followLine(Line3D line)
 {
+	//go to the right orientation
+	posAngles angles = calculateAngles(line.getStartPoint(), A1, A2);
+	updateOrientation(M_PI - angles.theta2 - angles.theta3);
+	
+	//go smoothly to startpoint;
+	goToPositionSmoothQuintic(line.getStartPoint());
+
 	float steps = line.getLength()/STEP_SIZE_CURVE;
 	
 	for (int i = 0; i < steps; i++)
 	{
-		goToPositionPencil(Point3D((line.getStartPoint()).x + i*(line.getDirection()).getX(), (line.getStartPoint()).y + i*(line.getDirection()).getY(),
-		(line.getStartPoint()).z + i*(line.getDirection()).getZ()));
+		Point3D p( (line.getStartPoint()).x + i*(line.getDirection()).getX(), (line.getStartPoint()).y + i*(line.getDirection()).getY(),
+		(line.getStartPoint()).z + i*(line.getDirection()).getZ() );
+		cout<<"Going to position"<< p << endl;
+		goToPositionPencil(p);
+		usleep(20000);
 	}
 }

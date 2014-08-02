@@ -21,11 +21,18 @@ template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
 
-/*
-void trajectoryPlanningDegrees(Servo*, float, float);
-vector<float> trajectoryPlanningDegrees(float, float);*/
+struct posAngles 
+{
+	float theta1;
+	float theta2;
+	float theta3;
+
+};
+
+
 vector<float> trajectoryPlanningQuintic(float, float, float);
 vector<float> trajectoryPlanningLSPD(float, float, float);
+posAngles calculateAngles(Point3D, int, int);
 
 class Manipulator
 {
@@ -39,9 +46,9 @@ void goToPositionSmoothLSPD(Point3D);
 void updateOrientation(float);
 void updateOrientation(float, float);
 
-void updatePosition(float, float, float);
-void updatePositionSmoothQuintic(float, float, float);
-void updatePositionSmoothLSPD(float, float, float);
+void updatePosition(posAngles);
+void updatePositionSmoothQuintic(posAngles);
+void updatePositionSmoothLSPD(posAngles);
 
 void followLine(Line3D);
 

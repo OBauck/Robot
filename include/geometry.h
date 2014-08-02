@@ -2,6 +2,8 @@
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_
 
+#include <iostream>
+
 using namespace std;
 
 class Point3D
@@ -12,6 +14,7 @@ public:
 	float x;
 	float y;
 	float z;
+	friend ostream& operator<< (ostream& output, const Point3D& p);
 };
 
 class Vector3D

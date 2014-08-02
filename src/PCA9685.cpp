@@ -60,7 +60,7 @@ void PCA9685::setPWM(int out_nr, uint16_t on_value, uint16_t off_value)
 
 void PCA9685::setPWM(int out_nr, uint16_t value)
 {
-	cout<<"setting PWM "<<out_nr<<" to: "<< value<<endl;
+	//cout<<"setting PWM "<<out_nr<<" to: "<< value<<endl;
 	setPWM(out_nr, 0, value);
 }
 

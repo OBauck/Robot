@@ -6,6 +6,12 @@
 
 using namespace std;
 
+ostream& operator<< (ostream& output, const Point3D& p)
+{
+	output << "(" << p.x << ", " << p.y << ", " << p.z << ")";
+	return output; 
+}
+
 Vector3D::Vector3D(Point3D startPoint,Point3D endPoint)
 {
 	x = endPoint.x - startPoint.x;
